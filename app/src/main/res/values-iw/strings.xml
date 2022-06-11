@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">Space Fight</string>
+    <string name="playText">שחק</string>
+    <string name="points">נקודות :</string>
+    <string name="Difficulty">רמות</string>
+    <string name="easyLevel">קל</string>
+    <string name="normalLevel">בינוני</string>
+    <string name="hardLevel">קשה</string>
+    <string name="musicOn">הדלק מוסיקה</string>
+    <string name="musicOff">כבה מוסיקה</string>
+    <string name="playerNameHint">הכנס את שמך</string>
+    <string name="saveBtn">שמור</string>
+</resources>

@@ -1,0 +1,13 @@
+<resources>
+    <string name="app_name">Space Fight</string>
+    <string name="playText">Play</string>
+    <string name="points">Score :</string>
+    <string name="Difficulty">Difficulty</string>
+    <string name="easyLevel">Easy</string>
+    <string name="normalLevel">Normal</string>
+    <string name="hardLevel">Hard</string>
+    <string name="musicOn">Turn on Music</string>
+    <string name="musicOff">Turn off music</string>
+    <string name="playerNameHint">Please enter your name</string>
+    <string name="saveBtn">Save</string>
+</resources>
