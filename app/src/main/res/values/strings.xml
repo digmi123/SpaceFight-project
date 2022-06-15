@@ -10,4 +10,6 @@
     <string name="musicOff">Turn off music</string>
     <string name="playerNameHint">Please enter your name</string>
     <string name="saveBtn">Save</string>
+    <string name="scoreBoardBtn">Scoreboard</string>
+    <string name="backBtn">Back</string>
 </resources>

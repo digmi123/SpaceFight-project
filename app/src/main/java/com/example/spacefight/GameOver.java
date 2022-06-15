@@ -1,11 +1,15 @@
 package com.example.spacefight;
 
+import android.app.ActionBar;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
+import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -19,10 +23,12 @@ import java.util.ArrayList;
 import java.util.Collections;
 
 public class GameOver extends AppCompatActivity {
-    EditText playerName;
-    Button saveBtn;
+    EditText nameEditText, playerNameTExtTest;
+    Button saveBtn, scoreBoardBtn;
     TextView tvPoints;
     ArrayList<scoreModel> scoresArrayList;
+    int points;
+
 
 
     @Override
@@ -30,33 +36,49 @@ public class GameOver extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.game_over);
 
-        playerName = findViewById(R.id.playerName);
         saveBtn = findViewById(R.id.saveBtn);
+        scoreBoardBtn = findViewById(R.id.scoreBoardBtn);
+        playerNameTExtTest = findViewById(R.id.playerName);
 
-        int points = getIntent().getExtras().getInt("points");
+        loadData();
+
+        points = getIntent().getExtras().getInt("points");
         tvPoints = findViewById(R.id.tvPoints);
         tvPoints.setText("" + points);
 
-        //load data from shared preferences.
-        loadData();
-
-
         //if the points greater than minimum score in list: player can enter name and save his score.
-        if (points > scoresArrayList.get(scoresArrayList.size() - 1).playerScore){
-            //Show editText of player name in order for the player to save his score if he wants.
 
+        if (scoresArrayList.size() == 0 || (points > scoresArrayList.get(scoresArrayList.size() - 1).playerScore)) {
+        Log.d("GameOver.soresArrayList", "size of the scoresArrayList : "+scoresArrayList.size());
+
+                Log.d("GameOver.if", "in the if of arrayList");
+                //Show editText of player name in order for the player to save his score if he wants.
+//            LinearLayout myLinearLayout = findViewById(R.id.scoreLinearLayout);
+//            nameEditText = new EditText(this);
+//
+//            LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT);
+//            nameEditText.setHint(R.string.playerNameHint);
+//            nameEditText.setTextSize(30);
+//            nameEditText.setLayoutParams(params);
+//            myLinearLayout.addView(nameEditText);
+
+            saveBtn.setOnClickListener(new View.OnClickListener() {
+                public void onClick(View v) {
+                    if (playerNameTExtTest.getText().toString() != "" ){
+                        saveData(playerNameTExtTest.getText().toString(), points);
+                    }
+                }
+            });
         }
 
-        saveBtn.setOnClickListener(new View.OnClickListener() {
+        scoreBoardBtn.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
-                if (playerName.getText().toString() != "" ){
-                    saveData(playerName.getText().toString(), points);
-                }
+                Intent intent = new Intent(GameOver.this, ScoreBoard.class);
+                GameOver.this.startActivity(intent);
             }
         });
+
     }
-
-
 
     //onClick SaveBtn :
 //    scoreModel newPlayerScore = new scoreModel(playerName.getText().toString(), points);
@@ -74,7 +96,6 @@ public class GameOver extends AppCompatActivity {
 
     public void loadData() {
         SharedPreferences sharedPreferences =  getSharedPreferences("shared preferences", MODE_PRIVATE);
-        SharedPreferences.Editor editor = sharedPreferences.edit();
         Gson gson = new Gson();
         String json = sharedPreferences.getString("scores", null);
 
@@ -94,11 +115,13 @@ public class GameOver extends AppCompatActivity {
     }
 
 
-
     private void saveData(String name, int score) {
 
-       scoreModel newPlayerScore = new scoreModel(playerName.getText().toString(), score);
+        Log.d("saveData", "saved the data "+name+", "+score);
+
+       scoreModel newPlayerScore = new scoreModel(name, score);
        scoresArrayList.add(newPlayerScore);
+        Log.d("added data to arrayList", ""+scoresArrayList);
 
 
         // method for saving the data in array list.
@@ -128,6 +151,8 @@ public class GameOver extends AppCompatActivity {
         editor.apply();
 
         // after saving data we are displaying a toast message.
+        Log.d("saved to shared pref", "saved the data to shared preferences");
+
         Toast.makeText(this, "Saved Array List to Shared preferences. ", Toast.LENGTH_SHORT).show();
     }
 }

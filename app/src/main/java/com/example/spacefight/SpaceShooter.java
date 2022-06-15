@@ -20,11 +20,11 @@ import java.util.Random;
 public class SpaceShooter extends View {
 
     Context context;
-    Bitmap background, lifeImage;
+    Bitmap background;
     Handler handler;
     long UPDATE_MILLIS = 30;
     static int screenWidth, screenHeight;
-    int points = 1;
+    int points = 0;
     Paint scorePaint;
     int TEXT_SIZE = 80;
     boolean paused = false;
@@ -74,22 +74,8 @@ public class SpaceShooter extends View {
         canvas.drawBitmap(background, 0, 0, null);
         canvas.drawText("Points: " + points, 0, TEXT_SIZE, scorePaint);
 
-        //Need to implement LifeImage.
-//        for(int i = 0; i < life; i++){
-//            canvas.drawBitmap(lifeImage, screenWidth - lifeImage.getWidth() * i, 0, null);
-//        }
-
-        //When life == 0 Game stops and launch GameOver activity with points.
-//        if (life == 0) {
-//            paused = true;
-//            handler = null;
-//            Intent intent = new Intent(context, GameOver.class);
-//            intent.putExtra("points", points);
-//            context.startActivity(intent);
-//            ((Activity) context).finish();
-//        }
         //Testing:
-        if (points == 0) {
+        if (points == -1) {
             paused = true;
             handler = null;
             Intent intent = new Intent(context, GameOver.class);
@@ -115,7 +101,6 @@ public class SpaceShooter extends View {
                 enemyShots.add(enemyShot);
                 //We are making enemyShot true so that the enemy can take one shot at a time.
                 enemyAction = true;
-
             }
 
             if (enemySpaceship.ex >= 400 + random.nextInt(800)) {
@@ -143,7 +128,7 @@ public class SpaceShooter extends View {
 
         // Draw our Spaceship:
         canvas.drawBitmap(ourSpaceship.getOurSpaceship(), ourSpaceship.ox, ourSpaceship.oy, null);
-        // Draw the enemy shot towards our spaceship and if its being hit, decrement life,
+        // Draw the enemy shot towards our spaceship and if its being hit
         // remove the shot object from enemyShots.
         // Else if, it goes away through the bottom edge of the screen also remove the shot from enemyShots.
         // When there is no enemyShots on the screen, change enemyAction to false, so that enemy can shot.
@@ -157,9 +142,8 @@ public class SpaceShooter extends View {
                     && enemyShots.get(i).shotY >= ourSpaceship.oy
                     && enemyShots.get(i).shotY <= screenHeight) {
 
-                //life--;
                 enemyShots.remove(i);
-                if (points > 0)
+                //if (points > 0)
                     points--;
 
             } else if (enemyShots.get(i).shotY >= screenHeight) {

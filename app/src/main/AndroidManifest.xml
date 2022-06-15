@@ -34,6 +34,11 @@
             android:exported="true"
             android:screenOrientation="landscape">
         </activity>
+        <activity
+            android:name=".ScoreBoard"
+            android:exported="true"
+            android:screenOrientation="landscape">
+        </activity>
     </application>
 
 </manifest>

@@ -11,4 +11,6 @@
     <string name="musicOff">כבה מוסיקה</string>
     <string name="playerNameHint">הכנס את שמך</string>
     <string name="saveBtn">שמור</string>
+    <string name="scoreBoardBtn">טבלת שיאים</string>
+    <string name="backBtn">חזור</string>
 </resources>

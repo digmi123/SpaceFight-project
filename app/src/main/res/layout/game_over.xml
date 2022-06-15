@@ -7,6 +7,7 @@
     android:padding="16dp">
 
     <LinearLayout
+        android:id="@+id/upperButtonsLayout"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:orientation="horizontal">
@@ -30,13 +31,14 @@
 
     </LinearLayout>
 
+
     <LinearLayout
+        android:id="@+id/scoreLayout"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:orientation="horizontal"
         android:layout_gravity="center"
-        android:layout_marginBottom="64dp"
-        android:gravity="center"
-        android:orientation="vertical">
+        android:gravity="center" >
 
         <TextView
             android:layout_width="wrap_content"
@@ -51,6 +53,14 @@
             android:layout_height="wrap_content"
             android:textColor="@color/black"
             android:textSize="40sp" />
+    </LinearLayout>
+
+    <LinearLayout
+        android:id="@+id/actionsLayout"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="vertical"
+        android:gravity="center">
 
         <EditText
             android:id="@+id/playerName"
@@ -59,16 +69,29 @@
             android:layout_gravity="center"
             android:hint="@string/playerNameHint"
             android:textColor="@color/black"
-            android:textStyle="bold"
-            android:textSize="30sp" />
-        <Button
-            android:id="@+id/saveBtn"
+            android:textSize="30sp"
+            android:textStyle="bold" />
+
+        <LinearLayout
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="@string/saveBtn"
-            android:textColor="@color/black"
-            android:background="@android:color/transparent"
-            />
+            android:orientation="horizontal">
+            <Button
+                android:id="@+id/saveBtn"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:background="@android:color/transparent"
+                android:text="@string/saveBtn"
+                android:textColor="@color/black" />
+
+            <Button
+                android:id="@+id/scoreBoardBtn"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:background="@android:color/transparent"
+                android:text="@string/scoreBoardBtn"
+                android:textColor="@color/black" />
+        </LinearLayout>
 
     </LinearLayout>
 
