@@ -25,35 +25,35 @@
 
 
         <Button
+            android:id="@+id/easyBtn"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="@string/easyLevel"
             android:textSize="25sp"
             android:textStyle="bold"
             android:background="@android:color/transparent"
-            android:onClick="difficultyMenu"
             android:layout_marginBottom="15dp"
             />
 
         <Button
+            android:id="@+id/mediumBtn"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="@string/normalLevel"
             android:textSize="25sp"
             android:textStyle="bold"
             android:background="@android:color/transparent"
-            android:onClick="difficultyMenu"
             android:layout_marginBottom="15dp"
             />
 
         <Button
+            android:id="@+id/hardBtn"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="@string/hardLevel"
             android:textSize="25sp"
             android:textStyle="bold"
             android:background="@android:color/transparent"
-            android:onClick="difficultyMenu"
             />
         <Button
             android:id="@+id/backBtn"

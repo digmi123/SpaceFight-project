@@ -3,27 +3,22 @@ package com.example.spacefight;
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.view.Display;
 
 import java.util.Random;
 
-public class EnemySpaceship {
+public class EnemySpaceship extends Entity{
 
+    int shootingTimer = 0;
     Context context;
     Bitmap enemySpaceship;
-    int ex, ey;
-    int enemyVelocity;
-    Random random;
 
-    public EnemySpaceship(Context context){
+    public EnemySpaceship(Context context, Display display, float spaceShipX, float spaceShipY, int speed){
+        super(context, R.drawable.space_ship, 250, 200, spaceShipX - 125, spaceShipY, speed);
         this.context = context;
 
         enemySpaceship = BitmapFactory.decodeResource(context.getResources(), R.drawable.space_ship);
         enemySpaceship = Bitmap.createScaledBitmap(enemySpaceship, 300,300, true);
-
-        random = new Random();
-        ex = 200 + random.nextInt(400);
-        ey = 0;
-        enemyVelocity = 14 + random.nextInt(10);
 
     }
 

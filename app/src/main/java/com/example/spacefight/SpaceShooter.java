@@ -9,10 +9,14 @@ import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
 import android.graphics.Point;
+import android.os.Build;
 import android.os.Handler;
+import android.util.Log;
 import android.view.Display;
 import android.view.MotionEvent;
 import android.view.View;
+
+import androidx.annotation.RequiresApi;
 
 import java.util.ArrayList;
 import java.util.Random;
@@ -20,20 +24,22 @@ import java.util.Random;
 public class SpaceShooter extends View {
 
     Context context;
-    Bitmap background;
+    Display display;
+    Bitmap background, hp;
     Handler handler;
     long UPDATE_MILLIS = 30;
-    static int screenWidth, screenHeight;
+    static float screenWidth, screenHeight;
     int points = 0;
     Paint scorePaint;
     int TEXT_SIZE = 80;
     boolean paused = false;
+    Difficulty difficulty;
     OurSpaceship ourSpaceship;
     EnemySpaceship enemySpaceship;
+    HeartBonus heartBonus;
     Random random;
     ArrayList<Shot> enemyShots, ourShots;
-
-    boolean enemyAction = false;
+    ArrayList<HeartBonus> bonuses;
 
     final Runnable runnable = new Runnable() {
         @Override
@@ -46,20 +52,27 @@ public class SpaceShooter extends View {
     public SpaceShooter(Context context) {
         super(context);
         this.context = context;
-        Display display = ((Activity) getContext()).getWindowManager().getDefaultDisplay();
+        display = ((Activity) getContext()).getWindowManager().getDefaultDisplay();
         Point size = new Point();
         display.getSize(size);
         screenWidth = size.x;
         screenHeight = size.y;
         random = new Random();
+        difficulty = new Difficulty(StartUp.difficultyLevel);
         enemyShots = new ArrayList<>();
         ourShots = new ArrayList<>();
-        ourSpaceship = new OurSpaceship(context);
-        enemySpaceship = new EnemySpaceship(context);
+        ourSpaceship = new OurSpaceship(context, display, screenWidth / 2, SpaceShooter.screenHeight, 10);
+        enemySpaceship = new EnemySpaceship(context, display, screenWidth / 2, 0, difficulty.enemySpeed());
+        bonuses = new ArrayList<>();
         handler = new Handler();
 
+        //Creating the images.
         background = BitmapFactory.decodeResource(context.getResources(), R.drawable.background2);
-        background = Bitmap.createScaledBitmap(background, screenWidth, screenHeight, true);
+        background = Bitmap.createScaledBitmap(background, (int)screenWidth, (int)screenHeight, true);
+
+        hp = BitmapFactory.decodeResource(context.getResources(), R.drawable.heart);
+        hp = Bitmap.createScaledBitmap(hp, 150, 120, true);
+
 
         scorePaint = new Paint();
         scorePaint.setColor(Color.RED);
@@ -68,91 +81,82 @@ public class SpaceShooter extends View {
 
     }
 
+    @RequiresApi(api = Build.VERSION_CODES.N)
     @Override
     protected void onDraw(Canvas canvas) {
-        //Draw background Points and life that i need to add on Canvas.
-        canvas.drawBitmap(background, 0, 0, null);
-        canvas.drawText("Points: " + points, 0, TEXT_SIZE, scorePaint);
 
-        //Testing:
-        if (points == -1) {
-            paused = true;
-            handler = null;
-            Intent intent = new Intent(context, GameOver.class);
-            intent.putExtra("points", points);
-            context.startActivity(intent);
-            ((Activity) context).finish();
-        }
+        //Draw the game details such as background and life.
+        drawGameScreenDetails(canvas);
 
-        enemySpaceship.ex += enemySpaceship.enemyVelocity;
+        enemySpaceship.xPosition += enemySpaceship.speed;
+        Log.d("The enemy speed", ""+enemySpaceship.speed);
+        enemySpaceship.move(canvas);
         //if enemy collides the right wall velocity reverse.
-        if (enemySpaceship.ex + enemySpaceship.getEnemySpaceshipWidth() >= screenWidth) {
-            enemySpaceship.enemyVelocity *= -1;
+        if ((enemySpaceship.xPosition + enemySpaceship.getEnemySpaceshipWidth() >= screenWidth) || enemySpaceship.xPosition <= 0) {
+            enemySpaceship.speed *= -1;
         }
 
-        //if enemy collides the left wall velocity reverse.
-        if (enemySpaceship.ex <= 0) {
-            enemySpaceship.enemyVelocity *= -1;
+        enemySpaceship.shootingTimer--;
+        if (enemySpaceship.shootingTimer < 0){
+            enemySpaceship.shootingTimer = difficulty.enemyFireRate();
+            Shot enemyShot = new Shot(context, display, enemySpaceship.xPosition + enemySpaceship.getEnemySpaceshipWidth() / 2, enemySpaceship.yPosition, difficulty.enemyShotsSpeed());
+            enemyShots.add(enemyShot);
         }
 
-        if (enemyAction == false) {
-            if (enemySpaceship.ex >= 200 + random.nextInt(400)) {
-                Shot enemyShot = new Shot(context, enemySpaceship.ex + enemySpaceship.getEnemySpaceshipWidth() / 2, enemySpaceship.ey);
-                enemyShots.add(enemyShot);
-                //We are making enemyShot true so that the enemy can take one shot at a time.
-                enemyAction = true;
+        Bonus:
+        switch(random.nextInt(difficulty.timerForBonus())) {
+            case 1:
+                heartBonus = new HeartBonus(context, display, random.nextFloat()*screenWidth, 0, difficulty.bonusSpeed());
+                bonuses.add(heartBonus);
+            case 2:
+                // ShieldBonus
+                break;
+            default:
+        }
+
+        for(Bonus bonus: bonuses){
+            bonus.yPosition += bonus.speed;
+            bonus.move(canvas);
+            if(bonus.isCollision(ourSpaceship)){
+                bonus.activate(ourSpaceship);
             }
-
-            if (enemySpaceship.ex >= 400 + random.nextInt(800)) {
-                Shot enemyShot = new Shot(context, enemySpaceship.ex + enemySpaceship.getEnemySpaceshipWidth() / 2, enemySpaceship.ey);
-                enemyShots.add(enemyShot);
-                //We are making enemyShot true so that the enemy can take one shot at a time.
-                enemyAction = true;
-
-            } else {
-                Shot enemyShot = new Shot(context, enemySpaceship.ex + enemySpaceship.getEnemySpaceshipWidth() / 2, enemySpaceship.ey);
-                enemyShots.add(enemyShot);
-                //We are making enemyShot true so that the enemy can take one shot at a time.
-                enemyAction = true;
-
+            if(bonus.yPosition > screenHeight){
+                bonus.active = false;
             }
         }
-        // Draw the enemy spaceship:
-        canvas.drawBitmap(enemySpaceship.getEnemySpaceship(), enemySpaceship.ex, enemySpaceship.ey, null);
+        bonuses.removeIf(bonus -> (!bonus.active));
 
-        if (ourSpaceship.ox > screenWidth - ourSpaceship.getOurSpaceshipWidth()) {
-            ourSpaceship.ox = screenWidth - ourSpaceship.getOurSpaceshipWidth();
-        } else if (ourSpaceship.ox < 0) {
-            ourSpaceship.ox = 0;
+
+        if (ourSpaceship.getXPosition() > screenWidth - ourSpaceship.getOurSpaceshipWidth()) {
+            ourSpaceship.setXPosition(screenWidth - ourSpaceship.getOurSpaceshipWidth());
+        } else if (ourSpaceship.getXPosition() < 0) {
+            ourSpaceship.setXPosition(0);
         }
 
         // Draw our Spaceship:
-        canvas.drawBitmap(ourSpaceship.getOurSpaceship(), ourSpaceship.ox, ourSpaceship.oy, null);
+        ourSpaceship.move(canvas);
+
         // Draw the enemy shot towards our spaceship and if its being hit
         // remove the shot object from enemyShots.
         // Else if, it goes away through the bottom edge of the screen also remove the shot from enemyShots.
         // When there is no enemyShots on the screen, change enemyAction to false, so that enemy can shot.
 
         // If i will implement difficulty level i will make the shotY velocity in variable.
-        for (int i = 0; i < enemyShots.size(); i++) {
-            enemyShots.get(i).shotY += 15;
-            canvas.drawBitmap(enemyShots.get(i).getShot(), enemyShots.get(i).shotX, enemyShots.get(i).shotY, null);
-            if ((enemyShots.get(i).shotX >= ourSpaceship.ox)
-                    && enemyShots.get(i).shotX <= ourSpaceship.ox + ourSpaceship.getOurSpaceshipWidth()
-                    && enemyShots.get(i).shotY >= ourSpaceship.oy
-                    && enemyShots.get(i).shotY <= screenHeight) {
-
-                enemyShots.remove(i);
-                //if (points > 0)
-                    points--;
-
-            } else if (enemyShots.get(i).shotY >= screenHeight) {
-                enemyShots.remove(i);
+        for (Shot shot: enemyShots) {
+            //Changing the Y position of the image and moving it on the canvas.
+            shot.yPosition += shot.speed;
+            shot.move(canvas);
+            if(shot.isCollision(ourSpaceship)){
+                shot.active = false;
+                ourSpaceship.lives--;
             }
-            if (enemyShots.size() < 1) {
-                enemyAction = false;
+            if(shot.yPosition > screenHeight){
+                shot.active = false;
             }
         }
+        enemyShots.removeIf(s -> (!s.active));
+
+
 
         // Draw our spaceship shots Towards the enemy. if there is a collision between our shot and enemy
         // spaceship, increment points, remove the shot from OurShots and make sound if necessary of hit
@@ -160,20 +164,18 @@ public class SpaceShooter extends View {
         // the shot object from OUrShots ArrayList
 
         // If i will implement difficulty level i will make the shotY velocity in variable.
-        for (int i = 0; i < ourShots.size(); i++) {
-            ourShots.get(i).shotY -= 15;
-            canvas.drawBitmap(ourShots.get(i).getShot(), ourShots.get(i).shotX, ourShots.get(i).shotY, null);
-            if ((ourShots.get(i).shotX >= enemySpaceship.ex)
-                    && ourShots.get(i).shotX <= enemySpaceship.ex + enemySpaceship.getEnemySpaceshipWidth()
-                    && ourShots.get(i).shotY <= enemySpaceship.getEnemySpaceshipWidth()
-                    && ourShots.get(i).shotY >= enemySpaceship.ey) {
+        for (Shot shot: ourShots) {
+            shot.yPosition -= 15;
+            shot.move(canvas);
+            if (shot.isCollision(enemySpaceship)) {
                 points++;
-                ourShots.remove(i);
+                shot.active = false;
                 //make sound if necessary.
-            } else if (ourShots.get(i).shotY <= 0) {
-                ourShots.remove(i);
+            } else if (shot.yPosition <= 0) {
+                shot.active = false;
             }
         }
+        ourShots.removeIf(s -> (!s.active));
 
 
         // if not paused, we will call the postDelayed( method on handler object which will
@@ -181,6 +183,25 @@ public class SpaceShooter extends View {
         // UPDATE_MILLIS.
         if (!paused) {
             handler.postDelayed(runnable, UPDATE_MILLIS);
+        }
+    }
+
+    public void drawHearts(Canvas canvas){
+        int top = 50;
+        for (int i = 0; i < ourSpaceship.lives; i++)
+        {
+            canvas.drawBitmap(hp, screenWidth - (hp.getWidth() * (i+1)) + i*5, top, null);
+        }
+
+
+        //Condition for game over.
+        if (ourSpaceship.lives == 0) {
+            paused = true;
+            handler = null;
+            Intent intent = new Intent(context, GameOver.class);
+            intent.putExtra("points", points);
+            context.startActivity(intent);
+            ((Activity) context).finish();
         }
     }
 
@@ -194,22 +215,31 @@ public class SpaceShooter extends View {
         // This way we restrict ourselves to making just one shot at a time on the screen.
         if (event.getAction() == MotionEvent.ACTION_UP) {
             //if (ourShots.size() < 1) {
-                Shot ourShot = new Shot(context, ourSpaceship.ox + ourSpaceship.getOurSpaceshipWidth() / 2, ourSpaceship.oy);
+                Shot ourShot = new Shot(context, display,ourSpaceship.getXPosition() + (float) ourSpaceship.getOurSpaceshipWidth() / 2, ourSpaceship.getYPosition(), 15);
                 ourShots.add(ourShot);
             //}
         }
         // When event.getAction is MotionEvent.ACTION_DOWN, control ourSpaceship
-        if (event.getAction() == MotionEvent.ACTION_DOWN) {
-            ourSpaceship.ox = touchX;
-        }
+//        if (event.getAction() == MotionEvent.ACTION_DOWN) {
+//            ourSpaceship.setXPosition(touchX);
+//        }
         // When event.getAction() is MotionEvent.ACTION_MOVE, control ourSpaceship
         // along with the touch.
         if (event.getAction() == MotionEvent.ACTION_MOVE) {
-            ourSpaceship.ox = touchX;
+            ourSpaceship.setXPosition(touchX);
         }
         // Returning true in an onTouchEvent tells android system that you already handled
         // the touch event and no further handling is required.
         return true;
+    }
+
+    public void drawGameScreenDetails(Canvas canvas){
+        //Draw background Points and life that i need to add on Canvas.
+        canvas.drawBitmap(background, 0, 0, null);
+        canvas.drawText("Points: " + points, 0, TEXT_SIZE, scorePaint);
+
+        //draw the hearts on the screen:
+        drawHearts(canvas);
     }
 
 }

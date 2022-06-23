@@ -12,6 +12,7 @@ import androidx.appcompat.app.AppCompatActivity;
 public class StartUp extends AppCompatActivity {
     MediaPlayer background_music;
     boolean musicPaused = false;
+    static Difficulty.Level difficultyLevel = Difficulty.Level.medium;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {

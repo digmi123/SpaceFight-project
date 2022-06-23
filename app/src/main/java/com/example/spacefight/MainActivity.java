@@ -1,9 +1,7 @@
 package com.example.spacefight;
 
 import androidx.appcompat.app.AppCompatActivity;
-
 import android.os.Bundle;
-import android.widget.Space;
 
 public class MainActivity extends AppCompatActivity {
 

@@ -1,17 +1,13 @@
 package com.example.spacefight;
 
-import android.app.ActionBar;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
-import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.EditText;
-import android.widget.LinearLayout;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
 
@@ -28,7 +24,6 @@ public class GameOver extends AppCompatActivity {
     TextView tvPoints;
     ArrayList<scoreModel> scoresArrayList;
     int points;
-
 
 
     @Override
@@ -85,7 +80,7 @@ public class GameOver extends AppCompatActivity {
 //    scoresArrayList.add(newPlayerScore);
 
     public void restart(View view){
-        Intent intent = new Intent(GameOver.this, StartUp.class);
+        Intent intent = new Intent(GameOver.this, MainActivity.class);
         startActivity(intent);
         finish();
     }
@@ -102,14 +97,12 @@ public class GameOver extends AppCompatActivity {
         // below line is to get the type of our array list.
         Type type = new TypeToken<ArrayList<scoreModel>>() {}.getType();
 
-        // in below line we are getting data from gson
-        // and saving it to our array list
+        // in below line we are getting data from gson and saving it to our array list
         scoresArrayList = gson.fromJson(json, type);
 
         // checking below if the array list is empty or not
         if (scoresArrayList == null) {
-            // if the array list is empty
-            // creating a new array list.
+            // if the array list is empty creating a new array list.
             scoresArrayList = new ArrayList<scoreModel>();
         }
     }
@@ -125,12 +118,10 @@ public class GameOver extends AppCompatActivity {
 
 
         // method for saving the data in array list.
-        // creating a variable for storing data in
-        // shared preferences.
+        // creating a variable for storing data in shared preferences.
         SharedPreferences sharedPreferences = getSharedPreferences("shared preferences", MODE_PRIVATE);
 
-        // creating a variable for editor to
-        // store data in shared preferences.
+        // creating a variable for editor to store data in shared preferences.
         SharedPreferences.Editor editor = sharedPreferences.edit();
 
         // creating a new variable for gson.
@@ -142,17 +133,13 @@ public class GameOver extends AppCompatActivity {
         // getting data from gson and storing it in a string.
         String scoresJson = gson.toJson(scoresArrayList);
 
-        // below line is to save data in shared
-        // prefs in the form of string.
+        // below line is to save data in shared prefs in the form of string.
         editor.putString("scores", scoresJson);
 
-        // below line is to apply changes
-        // and save data in shared prefs.
+        // below line is to apply changes and save data in shared prefs.
         editor.apply();
 
         // after saving data we are displaying a toast message.
         Log.d("saved to shared pref", "saved the data to shared preferences");
-
-        Toast.makeText(this, "Saved Array List to Shared preferences. ", Toast.LENGTH_SHORT).show();
     }
 }

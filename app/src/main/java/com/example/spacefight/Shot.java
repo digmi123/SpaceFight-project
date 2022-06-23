@@ -3,22 +3,16 @@ package com.example.spacefight;
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.view.Display;
 
-public class Shot {
+public class Shot extends Entity{
 
     Bitmap shot;
     Context context;
-    int shotX, shotY;
 
-    public Shot(Context context, int shotX, int shotY){
+    public Shot(Context context, Display display, float shotX, float shotY, int speed){
+        super(context, R.drawable.laser_bullet, 80, 80, shotX - 40, shotY - 40, speed);
         this.context = context;
-
-        shot = BitmapFactory.decodeResource(context.getResources(), R.drawable.laser_bullet);
-        shot = Bitmap.createScaledBitmap(shot, 80, 80, true);
-
-        this.shotX = shotX;
-        this.shotY = shotY;
-
     }
     public Bitmap getShot(){
         return shot;
