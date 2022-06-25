@@ -24,6 +24,7 @@
         android:layout_height="wrap_content"
         android:layout_marginTop="10dp"
         android:text="@string/playText"
+        android:textAllCaps="true"
         android:textColor="@color/black"
         android:textSize="50sp"
         android:textStyle="bold"
@@ -33,6 +34,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="@string/Difficulty"
+        android:textAllCaps="true"
         android:textSize="20sp"
         android:textStyle="bold"
         android:background="@android:color/transparent"
@@ -43,12 +45,13 @@
     <Button
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="@string/musicOff"
+        android:text="@string/soundOff"
         android:textSize="20sp"
         android:textStyle="bold"
         android:background="@android:color/transparent"
         android:id="@+id/soundButton"
         android:onClick="startPauseMusic"
+        android:textAllCaps="true"
         />
 
 </LinearLayout>

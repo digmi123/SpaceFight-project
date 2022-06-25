@@ -19,7 +19,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 
 public class GameOver extends AppCompatActivity {
-    EditText nameEditText, playerNameTExtTest;
+    EditText playerNameTExtTest;
     Button saveBtn, scoreBoardBtn;
     TextView tvPoints;
     ArrayList<scoreModel> scoresArrayList;
@@ -29,34 +29,11 @@ public class GameOver extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.game_over);
-
-        saveBtn = findViewById(R.id.saveBtn);
-        scoreBoardBtn = findViewById(R.id.scoreBoardBtn);
-        playerNameTExtTest = findViewById(R.id.playerName);
-
         loadData();
-
-        points = getIntent().getExtras().getInt("points");
-        tvPoints = findViewById(R.id.tvPoints);
-        tvPoints.setText("" + points);
-
-        //if the points greater than minimum score in list: player can enter name and save his score.
-
-        if (scoresArrayList.size() == 0 || (points > scoresArrayList.get(scoresArrayList.size() - 1).playerScore)) {
-        Log.d("GameOver.soresArrayList", "size of the scoresArrayList : "+scoresArrayList.size());
-
-                Log.d("GameOver.if", "in the if of arrayList");
-                //Show editText of player name in order for the player to save his score if he wants.
-//            LinearLayout myLinearLayout = findViewById(R.id.scoreLinearLayout);
-//            nameEditText = new EditText(this);
-//
-//            LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT);
-//            nameEditText.setHint(R.string.playerNameHint);
-//            nameEditText.setTextSize(30);
-//            nameEditText.setLayoutParams(params);
-//            myLinearLayout.addView(nameEditText);
-
+        boolean isNewScoreGreaterThanMin =  scoresArrayList.size() < 10 || (points > scoresArrayList.get(scoresArrayList.size() - 1).playerScore);
+        if (isNewScoreGreaterThanMin) {
+            setContentView(R.layout.game_over_add_to_scoreboard);
+            saveBtn = findViewById(R.id.saveBtn);
             saveBtn.setOnClickListener(new View.OnClickListener() {
                 public void onClick(View v) {
                     if (playerNameTExtTest.getText().toString() != "" ){
@@ -65,6 +42,18 @@ public class GameOver extends AppCompatActivity {
                 }
             });
         }
+        else{
+            setContentView(R.layout.game_over);
+        }
+
+        scoreBoardBtn = findViewById(R.id.scoreBoardBtn);
+        playerNameTExtTest = findViewById(R.id.playerName);
+
+
+        tvPoints = findViewById(R.id.tvPoints);
+        tvPoints.setText("" + points);
+
+        //if the points greater than minimum score in list: player can enter name and save his score.
 
         scoreBoardBtn.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
@@ -72,12 +61,7 @@ public class GameOver extends AppCompatActivity {
                 GameOver.this.startActivity(intent);
             }
         });
-
     }
-
-    //onClick SaveBtn :
-//    scoreModel newPlayerScore = new scoreModel(playerName.getText().toString(), points);
-//    scoresArrayList.add(newPlayerScore);
 
     public void restart(View view){
         Intent intent = new Intent(GameOver.this, MainActivity.class);
@@ -90,6 +74,7 @@ public class GameOver extends AppCompatActivity {
     }
 
     public void loadData() {
+        points = getIntent().getExtras().getInt("points");
         SharedPreferences sharedPreferences =  getSharedPreferences("shared preferences", MODE_PRIVATE);
         Gson gson = new Gson();
         String json = sharedPreferences.getString("scores", null);
@@ -107,13 +92,17 @@ public class GameOver extends AppCompatActivity {
         }
     }
 
-
     private void saveData(String name, int score) {
 
         Log.d("saveData", "saved the data "+name+", "+score);
 
        scoreModel newPlayerScore = new scoreModel(name, score);
-       scoresArrayList.add(newPlayerScore);
+       if (scoresArrayList.size() == 10){
+           scoresArrayList.set(scoresArrayList.size() - 1, newPlayerScore);
+       }
+       else{
+           scoresArrayList.add(newPlayerScore);
+       }
         Log.d("added data to arrayList", ""+scoresArrayList);
 
 

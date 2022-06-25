@@ -3,6 +3,7 @@ package com.example.spacefight;
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.graphics.Point;
 import android.view.Display;
 
 import java.util.Random;
@@ -13,7 +14,7 @@ public class EnemySpaceship extends Entity{
     Context context;
     Bitmap enemySpaceship;
 
-    public EnemySpaceship(Context context, Display display, float spaceShipX, float spaceShipY, int speed){
+    public EnemySpaceship(Context context, Point screenSize, float spaceShipX, float spaceShipY, int speed){
         super(context, R.drawable.space_ship, 250, 200, spaceShipX - 125, spaceShipY, speed);
         this.context = context;
 

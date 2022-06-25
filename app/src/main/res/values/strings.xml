@@ -6,8 +6,8 @@
     <string name="easyLevel">Easy</string>
     <string name="normalLevel">Normal</string>
     <string name="hardLevel">Hard</string>
-    <string name="musicOn">Turn on Music</string>
-    <string name="musicOff">Turn off music</string>
+    <string name="soundOn">Turn on sound</string>
+    <string name="soundOff">Turn off sound</string>
     <string name="playerNameHint">Please enter your name</string>
     <string name="saveBtn">Save</string>
     <string name="scoreBoardBtn">Scoreboard</string>
